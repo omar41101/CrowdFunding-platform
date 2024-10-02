@@ -1,85 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import abi from './CrowdFundingABI.json'; // Load the ABI
-import DisplayCampaigns from './Components/DisplayCampaigns'; // Display Campaigns Component
+import abi from './CrowdFundingABI.json';
+import DisplayCampaigns from './Components/DisplayCampaigns';
+import CreateCampaign from './Components/CreateCampaign';
+import UserInfo from './Components/UserInfo'; // Import UserInfo Component
 
-// Add this line to use Infura's Sepolia network
-const provider = new ethers.providers.JsonRpcProvider('https://sepolia.infura.io/v3/3983dd17cf254e0ba2cfb9103ed87510');
-
-// Replace with your actual contract address
-const contractAddress = "0x0e0cd8477C4fc686b55451c393A71193067F8D55"; 
+const contractAddress = "0x0e0cd8477C4fc686b55451c393A71193067F8D55";
 
 function App() {
   const [signer, setSigner] = useState(null);
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState(null);
+  const [isConnected, setIsConnected] = useState(false); // Track connection status
 
-  // Connect to MetaMask and get the provider
   useEffect(() => {
-    const connectWallet = async () => {
+    const checkWalletConnection = async () => {
       if (window.ethereum) {
-        try {
-          const tempProvider = new ethers.providers.Web3Provider(window.ethereum);
-          setSigner(tempProvider.getSigner());
-
-          const accounts = await tempProvider.send("eth_requestAccounts", []);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        if (accounts.length > 0) {
+          setSigner(provider.getSigner());
           setAccount(accounts[0]);
-
-          const tempContract = new ethers.Contract(contractAddress, abi, tempProvider.getSigner());
+          const tempContract = new ethers.Contract(contractAddress, abi, provider.getSigner());
           setContract(tempContract);
-        } catch (err) {
-          console.error("Error connecting to MetaMask:", err);
+          setIsConnected(true);
         }
-      } else {
-        console.error("MetaMask is not installed!");
       }
     };
 
-    connectWallet();
+    checkWalletConnection(); // Check if the wallet is already connected
   }, []);
 
-  // Function to create a new campaign
-  const createCampaign = async (title, description, target, deadline, image) => {
-    try {
-      const deadlineDate = new Date(deadline);
-      const deadlineTimestamp = Math.floor(deadlineDate.getTime() / 1000); // Convert to Unix timestamp
-
-      const tx = await contract.createCampaign(
-        account,
-        title,
-        description,
-        ethers.utils.parseEther(target),  // Convert target to Wei
-        deadlineTimestamp,                // Pass Unix timestamp for deadline
-        image
-      );
-      await tx.wait();
-      console.log("Campaign created!");
-    } catch (error) {
-      console.error("Error creating campaign:", error);
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        setSigner(provider.getSigner());
+        setAccount(accounts[0]);
+        const tempContract = new ethers.Contract(contractAddress, abi, provider.getSigner());
+        setContract(tempContract);
+        setIsConnected(true); // Update connection state
+      } catch (err) {
+        console.error("Error connecting to MetaMask:", err);
+      }
+    } else {
+      alert("MetaMask is not installed. Please install MetaMask to continue.");
     }
   };
 
   return (
-    <div>
-      <h1>Crowdfunding DApp</h1>
-      <h2>Connected Account: {account}</h2>
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-between">
+      <header className="bg-black p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold">Crowdfunding DApp</h1>
+        
+        {account ? (
+          <UserInfo account={account} />
+        ) : (
+          <button 
+            onClick={connectWallet} 
+            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            Connect Wallet
+          </button>
+        )}
+      </header>
 
-      {/* Fetch and display campaigns */}
-      {provider && <DisplayCampaigns provider={provider} />}
+      <main className="container mx-auto py-8 px-4">
+        {isConnected ? (
+          <>
+            <DisplayCampaigns contract={contract} /> {/* Display campaigns when connected */}
+            <CreateCampaign contract={contract} account={account} /> {/* Display create form when connected */}
+          </>
+        ) : (
+          <p className="text-center text-lg">Please connect your wallet to view and create campaigns.</p>
+        )}
+      </main>
 
-      {/* Form to create a new campaign */}
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const { title, description, target, deadline, image } = e.target.elements;
-        createCampaign(title.value, description.value, target.value, deadline.value, image.value);
-      }}>
-        <input name="title" placeholder="Title" required />
-        <input name="description" placeholder="Description" required />
-        <input name="target" placeholder="Target (ETH)" required />
-        <input name="deadline" type="date" placeholder="Deadline" required />
-        <input name="image" placeholder="Image URL" />
-        <button type="submit">Create Campaign</button>
-      </form>
+      <footer className="bg-black p-4 text-center">
+        <p>© 2023 Crowdfunding DApp</p>
+      </footer>
     </div>
   );
 }
