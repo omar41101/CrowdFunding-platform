@@ -6,8 +6,7 @@ const CampaignForm = ({ addCampaign }) => {
         title: '',
         description: '',
         target: '',
-        deadline: '',
-        image: ''
+         image: '',
     });
 
     const handleInputChange = (e) => {
@@ -19,7 +18,15 @@ const CampaignForm = ({ addCampaign }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        addCampaign(formData);
+
+        // Convert deadline from minutes to seconds
+       
+
+        const campaignData = {
+            ...formData,
+         };
+
+        addCampaign(campaignData);
     };
 
     return (
@@ -56,17 +63,7 @@ const CampaignForm = ({ addCampaign }) => {
                     required
                 />
             </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Deadline (Timestamp)</label>
-                <input
-                    type="number"
-                    name="deadline"
-                    onChange={handleInputChange}
-                    value={formData.deadline}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                    required
-                />
-            </div>
+           
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Image URL</label>
                 <input

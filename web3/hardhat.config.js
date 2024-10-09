@@ -8,7 +8,11 @@ module.exports = {
       url: `https://sepolia.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
       accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
-    // other networks
+    polygonAmoy: {
+      url: `https://polygon-amoy.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
+    },
+    // other networks can be added here
   },
   solidity: {
     version: "0.8.27",

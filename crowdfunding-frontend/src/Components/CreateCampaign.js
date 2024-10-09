@@ -7,19 +7,16 @@ const CreateCampaign = ({ contract, account }) => {
   const [isOpen, setIsOpen] = useState(false); // State to control the modal visibility
 
   // Function to create a new campaign
-  const createCampaign = async (title, description, target, deadline, image) => {
+  const createCampaign = async (title, description, target, image) => {
     try {
       setLoading(true);
       setError(null);
-      const deadlineDate = new Date(deadline);
-      const deadlineTimestamp = Math.floor(deadlineDate.getTime() / 1000); // Convert to Unix timestamp
 
       const tx = await contract.createCampaign(
         account,
         title,
         description,
         ethers.utils.parseEther(target), // Convert target to Wei
-        deadlineTimestamp,               // Pass Unix timestamp for deadline
         image
       );
       await tx.wait();
@@ -38,58 +35,74 @@ const CreateCampaign = ({ contract, account }) => {
       {/* Button to open modal */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
+        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
       >
         Create Campaign
       </button>
 
       {/* Modal */}
       {isOpen && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white p-6">
-                <h2 className="text-2xl font-semibold mb-4">Create a New Campaign</h2>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const { title, description, target, deadline, image } = e.target.elements;
-                    createCampaign(title.value, description.value, target.value, deadline.value, image.value);
-                  }}
-                >
-                  <div className="grid grid-cols-1 gap-4">
-                    <input className="p-2 border rounded-lg" name="title" placeholder="Title" required />
-                    <input className="p-2 border rounded-lg" name="description" placeholder="Description" required />
-                    <input className="p-2 border rounded-lg" name="target" placeholder="Target (ETH)" required />
-                    <input className="p-2 border rounded-lg" name="deadline" type="date" placeholder="Deadline" required />
-                    <input className="p-2 border rounded-lg" name="image" placeholder="Image URL" />
-                  </div>
-                  <div className="flex justify-end mt-4">
-                    <button
-                      type="button"
-                      onClick={() => setIsOpen(false)}
-                      className="mr-4 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-200"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
-                      disabled={loading}
-                    >
-                      {loading ? 'Creating...' : 'Create Campaign'}
-                    </button>
-                  </div>
-                  {error && <p className="text-red-600 mt-4">{error}</p>}
-                </form>
+        <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+              onClick={() => setIsOpen(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create a New Campaign</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const { title, description, target, image } = e.target.elements;
+                createCampaign(title.value, description.value, target.value, image.value);
+              }}
+            >
+              <div className="space-y-4">
+                <input
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  name="title"
+                  placeholder="Title"
+                  required
+                />
+                <textarea
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  name="description"
+                  placeholder="Description"
+                  required
+                />
+                <input
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  name="target"
+                  placeholder="Target (ETH)"
+                  required
+                />
+                <input
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  name="image"
+                  placeholder="Image URL"
+                />
               </div>
-            </div>
+
+              <div className="flex justify-end mt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="mr-4 bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-6 rounded-full shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
+                  disabled={loading}
+                >
+                  {loading ? 'Creating...' : 'Create Campaign'}
+                </button>
+              </div>
+
+              {error && <p className="text-red-600 mt-4">{error}</p>}
+            </form>
           </div>
         </div>
       )}

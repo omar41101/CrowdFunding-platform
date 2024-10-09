@@ -8,8 +8,7 @@ const CampaignCard = ({ campaign }) => {
       <p>{campaign.description}</p>
       <p>Goal: {ethers.utils.formatEther(campaign.target)} ETH</p>
       <p>Collected: {ethers.utils.formatEther(campaign.amountCollected)} ETH</p>
-      <p>Deadline: {new Date(campaign.deadline * 1000).toLocaleString()}</p>
-    </div>
+     </div>
   );
 };
 
