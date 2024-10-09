@@ -5,7 +5,7 @@ import DisplayCampaigns from './Components/DisplayCampaigns';
 import CreateCampaign from './Components/CreateCampaign';
 import UserInfo from './Components/UserInfo'; // Import UserInfo Component
 
-const contractAddress = "0x295302f5226F90151ae024Dd56fc6B397387Ae37";
+const contractAddress = "0xc6da8028f0B89afe9f5b3A45D1851bA1d027729d";
 
 function App() {
   const [signer, setSigner] = useState(null);
