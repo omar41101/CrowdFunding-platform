@@ -1,108 +1,161 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
+import Web3 from 'web3'; // To handle conversions between Ether and Wei
 
 const CreateCampaign = ({ contract, account }) => {
-  const [loading, setLoading] = useState(false);
+  // State to store form inputs
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [target, setTarget] = useState('');
+  const [duration, setDuration] = useState('');
+  const [image, setImage] = useState('');
+  const [isOpen, setIsOpen] = useState(false); // Control modal visibility
+
+  // State to show any error messages
   const [error, setError] = useState(null);
-  const [isOpen, setIsOpen] = useState(false); // State to control the modal visibility
 
-  // Function to create a new campaign
-  const createCampaign = async (title, description, target, image) => {
+  // Helper function to create a new campaign
+  const handleCreateCampaign = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      if (!contract) {
+        setError('Contract is not initialized');
+        return;
+      }
 
+      if (!title || !description || !target || !duration || !image) {
+        setError('All fields are required');
+        return;
+      }
+
+      // Convert target to Wei (smallest unit of Ether)
+      const targetInWei = Web3.utils.toWei(target, 'ether'); // Ensure you import Web3 for this conversion
+
+      // Convert duration from days to seconds (as required by the contract)
+      const durationInSeconds = parseInt(duration) * 24 * 60 * 60;
+
+      // Call the smart contract function
       const tx = await contract.createCampaign(
-        account,
-        title,
-        description,
-        ethers.utils.parseEther(target), // Convert target to Wei
-        image
+        account,               // Owner address
+        title,                 // Campaign title
+        description,           // Campaign description
+        targetInWei,           // Target in Wei
+        durationInSeconds,     // Duration in seconds
+        image                  // Campaign image URL
       );
-      await tx.wait();
-      console.log("Campaign created!");
-      setIsOpen(false); // Close modal after successful campaign creation
-    } catch (error) {
-      console.error("Error creating campaign:", error);
-      setError("Failed to create campaign");
-    } finally {
-      setLoading(false);
+
+      await tx.wait();  // Wait for the transaction to be mined
+
+      alert('Campaign created successfully!');
+      // Reset form after successful creation
+      setTitle('');
+      setDescription('');
+      setTarget('');
+      setDuration('');
+      setImage('');
+      setError(null); // Clear any previous errors
+      setIsOpen(false); // Close the modal after successful campaign creation
+    } catch (err) {
+      console.error('Error creating campaign:', err);
+      setError('Failed to create campaign. Check console for details.');
     }
   };
 
   return (
     <div>
-      {/* Button to open modal */}
-      <button
+      {/* Button to open the modal */}
+      <button 
+        className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
         onClick={() => setIsOpen(true)}
-        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-2 px-6 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
       >
         Create Campaign
       </button>
 
-      {/* Modal */}
+      {/* Modal Section */}
       {isOpen && (
-        <div className="fixed z-10 inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-              onClick={() => setIsOpen(false)}
-            >
-              ✕
-            </button>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create a New Campaign</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const { title, description, target, image } = e.target.elements;
-                createCampaign(title.value, description.value, target.value, image.value);
-              }}
-            >
-              <div className="space-y-4">
-                <input
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                  name="title"
-                  placeholder="Title"
-                  required
-                />
-                <textarea
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                  name="description"
-                  placeholder="Description"
-                  required
-                />
-                <input
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                  name="target"
-                  placeholder="Target (ETH)"
-                  required
-                />
-                <input
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                  name="image"
-                  placeholder="Image URL"
-                />
-              </div>
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
+            <div className="p-6 bg-white rounded-lg shadow-md max-w-lg w-full">
+              <h2 className="text-2xl font-bold mb-4">Create a New Campaign</h2>
 
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="mr-4 bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-6 rounded-full shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
-                  disabled={loading}
-                >
-                  {loading ? 'Creating...' : 'Create Campaign'}
-                </button>
-              </div>
+              {error && <p className="text-red-500 mb-4">{error}</p>}
 
-              {error && <p className="text-red-600 mt-4">{error}</p>}
-            </form>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateCampaign();
+                }}
+              >
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <textarea
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <input
+                    type="number"
+                    placeholder="Target (ETH)"
+                    value={target}
+                    onChange={(e) => setTarget(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <input
+                    type="number"
+                    placeholder="Duration (days)"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Image URL"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)} // Close the modal
+                    className="mr-4 p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
+                  >
+                    Create Campaign
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
