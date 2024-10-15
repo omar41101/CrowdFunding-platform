@@ -4,7 +4,7 @@ import BN from 'bn.js'; // Use BN.js directly for BigNumber handling
 import abi from '../CrowdFundingABI.json';
 import './DisplayCampaign.css';
 
-const contractAddress = "0x52C2CfCe16b112668ab1Fd2D350B0efBc86D2103";
+const contractAddress = "0x83f3C99Cc70133DBa8Db231591dCfFF5b9710991";
 const contractABI = abi;
 
 const DisplayCampaign = ({ account }) => {

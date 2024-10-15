@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import Web3 from 'web3'; // Import Web3 for interacting with blockchain
 
 const AdminApproveCampaign = ({ contract, account }) => {
   const [adminCampaigns, setAdminCampaigns] = useState([]);
   const [activeCampaigns, setActiveCampaigns] = useState([]);
   const [loadingAdmin, setLoadingAdmin] = useState(true);
   const [loadingActive, setLoadingActive] = useState(true);
-  const [approving, setApproving] = useState(false); // State to track approval process
+  const [approving, setApproving] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
 
-  // Function to fetch pending admin campaigns (those awaiting approval)
   const fetchAdminCampaigns = async () => {
     if (contract) {
       try {
         setLoadingAdmin(true);
-        const campaigns = await contract.getAdminCampaigns(); // Call the contract method to get admin campaigns
+        const campaigns = await contract.getAdminCampaigns();
         setAdminCampaigns(campaigns);
       } catch (error) {
         console.error("Error fetching admin campaigns:", error);
@@ -25,39 +24,50 @@ const AdminApproveCampaign = ({ contract, account }) => {
     }
   };
 
-  // Function to fetch active (approved) campaigns
   const fetchActiveCampaigns = async () => {
     if (contract) {
       try {
         setLoadingActive(true);
-        const campaigns = await contract.getActiveCampaigns(); // Call the contract method to get active campaigns
+        const campaigns = await contract.getActiveCampaigns();
         setActiveCampaigns(campaigns);
       } catch (error) {
         console.error("Error fetching active campaigns:", error);
-        alert("Failed to fetch active campaigns. Please try again.");
+        alert("Failed to fetch active campaigns.");
       } finally {
         setLoadingActive(false);
       }
     }
   };
 
-  // Function to approve a campaign by its ID
-  const approveCampaign = async (campaignId) => {
+  const withdrawFunds = async (campaignId) => {
     try {
-      setApproving(true); // Start approval process
-      const tx = await contract.approveCampaign(campaignId);
+      setWithdrawing(true);
+      const tx = await contract.withdrawFunds(campaignId);
       await tx.wait();
-      alert("Campaign approved successfully!");
-      fetchAdminCampaigns(); // Refresh the list after approval
+      alert("Funds withdrawn successfully!");
     } catch (error) {
-      console.error("Error approving campaign:", error);
-      alert("Failed to approve campaign. Please try again.");
+      console.error("Error withdrawing funds:", error);
+      alert("Withdrawal failed. Please try again.");
     } finally {
-      setApproving(false); // End approval process
+      setWithdrawing(false);
     }
   };
 
-  // Fetch campaigns when the component loads
+  const approveCampaign = async (campaignId) => {
+    try {
+      setApproving(true);
+      const tx = await contract.approveCampaign(campaignId);
+      await tx.wait();
+      alert("Campaign approved successfully!");
+      fetchAdminCampaigns();
+    } catch (error) {
+      console.error("Error approving campaign:", error);
+      alert("Failed to approve campaign.");
+    } finally {
+      setApproving(false);
+    }
+  };
+
   useEffect(() => {
     if (contract) {
       fetchAdminCampaigns();
@@ -84,8 +94,11 @@ const AdminApproveCampaign = ({ contract, account }) => {
                 <img src={campaign.image} alt={campaign.title} className="h-48 w-full object-cover rounded-lg mb-4" />
                 <h3 className="text-2xl font-semibold mb-2 dark:text-white">{campaign.title}</h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-2">{campaign.description}</p>
-                <p className="text-gray-900 dark:text-white">Target: {ethers.utils.formatEther(campaign.target)} ETH</p>
-                <p className="text-gray-900 dark:text-white">Collected: {ethers.utils.formatEther(campaign.amountCollected)} ETH</p>
+                
+                {/* Ensure amountCollected and target are converted properly */}
+                <p className="text-gray-900 dark:text-white">Target: {ethers.utils.formatEther(campaign.target.toString())} ETH</p>
+                <p className="text-gray-900 dark:text-white">Collected: {ethers.utils.formatEther(campaign.amountCollected.toString())} ETH</p>
+                
                 <p className="text-gray-600 dark:text-gray-400">Deadline: {new Date(campaign.deadline * 1000).toLocaleString()}</p>
                 <p className="text-gray-600 dark:text-gray-400">Owner: {campaign.owner}</p>
                 <button
@@ -118,10 +131,24 @@ const AdminApproveCampaign = ({ contract, account }) => {
                 <img src={campaign.image} alt={campaign.title} className="h-48 w-full object-cover rounded-lg mb-4" />
                 <h3 className="text-2xl font-semibold mb-2 dark:text-white">{campaign.title}</h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-2">{campaign.description}</p>
-                <p className="text-gray-900 dark:text-white">Target: {ethers.utils.formatEther(campaign.target)} ETH</p>
-                <p className="text-gray-900 dark:text-white">Collected: {ethers.utils.formatEther(campaign.amountCollected)} ETH</p>
+                
+                {/* Ensure amountCollected and target are converted properly */}
+                <p className="text-gray-900 dark:text-white">Target: {ethers.utils.formatEther(campaign.target.toString())} ETH</p>
+                <p className="text-gray-900 dark:text-white">Collected: {ethers.utils.formatEther(campaign.amountCollected.toString())} ETH</p>
+                
                 <p className="text-gray-600 dark:text-gray-400">Deadline: {new Date(campaign.deadline * 1000).toLocaleString()}</p>
                 <p className="text-gray-600 dark:text-gray-400">Owner: {campaign.owner}</p>
+
+                {/* Show Withdraw button for completed campaigns */}
+                {ethers.BigNumber.from(campaign.amountCollected).gte(ethers.BigNumber.from(campaign.target)) && (
+                  <button
+                    onClick={() => withdrawFunds(index)}
+                    disabled={withdrawing}
+                    className={`mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors ${withdrawing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {withdrawing ? 'Withdrawing...' : 'Withdraw Funds'}
+                  </button>
+                )}
               </div>
             ))}
           </div>
