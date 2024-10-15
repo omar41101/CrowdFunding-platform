@@ -4,7 +4,7 @@ import abi from './CrowdFundingABI.json';
 import DisplayCampaigns from './Components/DisplayCampaigns';
 import CreateCampaign from './Components/CreateCampaign';
 import UserInfo from './Components/UserInfo';
-import AdminApproveCampaign from './Components/AdminApproveCampaign'; // Import AdminApproveCampaign
+import AdminApproveCampaign from './Components/AdminApproveCampaign';
 
 const contractAddress = "0x83f3C99Cc70133DBa8Db231591dCfFF5b9710991";
 
@@ -28,13 +28,28 @@ function App() {
           setIsConnected(true);
 
           // Check if the connected account is the admin
-          const adminAddress = await tempContract.admin(); // Ensure you have a function in the contract to get admin address
+          const adminAddress = await tempContract.admin();
           setIsAdmin(accounts[0].toLowerCase() === adminAddress.toLowerCase());
         }
       }
     };
 
     checkWalletConnection();
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', () => {
+        window.location.reload(); // Refresh the page when the account is changed
+      });
+    }
+
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('accountsChanged', () => {
+          window.location.reload();
+        });
+      }
+    };
   }, []);
 
   const connectWallet = async () => {

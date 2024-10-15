@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import Web3 from 'web3'; // To handle conversions between Ether and Wei
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateCampaign = ({ contract, account }) => {
-  // State to store form inputs
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [target, setTarget] = useState('');
   const [duration, setDuration] = useState('');
   const [image, setImage] = useState('');
   const [isOpen, setIsOpen] = useState(false); // Control modal visibility
-
-  // State to show any error messages
   const [error, setError] = useState(null);
 
   // Helper function to create a new campaign
@@ -28,8 +27,7 @@ const CreateCampaign = ({ contract, account }) => {
       }
 
       // Convert target to Wei (smallest unit of Ether)
-      const targetInWei = Web3.utils.toWei(target, 'ether'); // Ensure you import Web3 for this conversion
-
+      const targetInWei = Web3.utils.toWei(target, 'ether');
       // Convert duration from days to seconds (as required by the contract)
       const durationInSeconds = parseInt(duration) * 24 * 60 * 60;
 
@@ -45,7 +43,9 @@ const CreateCampaign = ({ contract, account }) => {
 
       await tx.wait();  // Wait for the transaction to be mined
 
-      alert('Campaign created successfully!');
+      // Display a success message using Toastify
+      toast.success('Campaign created successfully! Request sent to admin for approval.');
+
       // Reset form after successful creation
       setTitle('');
       setDescription('');
@@ -57,12 +57,12 @@ const CreateCampaign = ({ contract, account }) => {
     } catch (err) {
       console.error('Error creating campaign:', err);
       setError('Failed to create campaign. Check console for details.');
+      toast.error('Failed to create campaign. Please try again.');
     }
   };
 
   return (
     <div>
-      {/* Button to open the modal */}
       <button 
         className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all"
         onClick={() => setIsOpen(true)}
@@ -70,7 +70,6 @@ const CreateCampaign = ({ contract, account }) => {
         Create Campaign
       </button>
 
-      {/* Modal Section */}
       {isOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
@@ -91,7 +90,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md"
                     required
                   />
                 </div>
@@ -101,7 +100,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md"
                     required
                   />
                 </div>
@@ -112,7 +111,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Target (ETH)"
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
-                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md"
                     required
                   />
                 </div>
@@ -123,7 +122,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Duration (days)"
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md"
                     required
                   />
                 </div>
@@ -134,7 +133,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Image URL"
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md"
                     required
                   />
                 </div>
@@ -159,6 +158,9 @@ const CreateCampaign = ({ contract, account }) => {
           </div>
         </div>
       )}
+
+      {/* Toastify notification container */}
+      <ToastContainer />
     </div>
   );
 };
