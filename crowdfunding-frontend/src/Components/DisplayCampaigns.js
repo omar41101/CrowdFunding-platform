@@ -34,7 +34,33 @@ const DisplayCampaign = ({ account }) => {
       setLoading(false);
     }
   };
+ const handleUpdateCampaign = async () => {
+    if (!selectedCampaign) return;
+    try {
+      const web3 = new Web3(window.ethereum);
+      await window.ethereum.enable();
 
+      const contract = new web3.eth.Contract(contractABI, contractAddress);
+      const accounts = await web3.eth.getAccounts();
+      const account = accounts[0];
+
+      await contract.methods
+        .updateCampaign(
+          selectedCampaign, 
+          updateTitle, 
+          updateDescription, 
+          Web3.utils.toWei(updateTarget, 'ether'), 
+          updateImage
+        )
+        .send({ from: account });
+
+      alert("Campaign updated successfully!");
+      fetchCampaigns(); // Refresh the campaign list after updating
+    } catch (error) {
+      console.error("Error updating campaign:", error);
+      alert("Failed to update campaign");
+    }
+  };
   // Fetch admin campaigns
   const fetchAdminCampaigns = async () => {
     try {
@@ -105,32 +131,7 @@ const DisplayCampaign = ({ account }) => {
   };
 
   // Handle campaign update
-  const handleUpdateCampaign = async () => {
-    if (!selectedCampaign) return;
-    try {
-      const web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
-
-      const contract = new web3.eth.Contract(contractABI, contractAddress);
-      const accounts = await web3.eth.getAccounts();
-      const account = accounts[0];
-
-      await contract.methods.updateCampaign(
-        selectedCampaign,
-        updateTitle,
-        updateDescription,
-        Web3.utils.toWei(updateTarget, 'ether'),
-        updateImage
-      ).send({ from: account });
-
-      alert("Campaign updated successfully!");
-      setIsOpenUpdateModal(false);
-      fetchCampaigns(); // Refresh the campaigns list
-    } catch (error) {
-      console.error("Error updating campaign:", error);
-      alert("Failed to update campaign");
-    }
-  };
+   
 
   // Handle campaign deletion
   const handleDeleteCampaign = async (campaignId) => {
