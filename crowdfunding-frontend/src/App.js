@@ -6,7 +6,7 @@ import CreateCampaign from './Components/CreateCampaign';
 import UserInfo from './Components/UserInfo';
 import AdminApproveCampaign from './Components/AdminApproveCampaign';
 
-const contractAddress = "0x83f3C99Cc70133DBa8Db231591dCfFF5b9710991";
+const contractAddress = "0x8E06a29cA511bFa6Bf7Fec908e427cA14C619908";
 
 function App() {
   const [signer, setSigner] = useState(null);

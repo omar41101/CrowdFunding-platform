@@ -13,6 +13,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "approveWithdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -63,6 +76,37 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "campaignId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			}
+		],
+		"name": "CampaignUpdated",
+		"type": "event"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -103,19 +147,6 @@
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
-			}
-		],
-		"name": "declineCampaign",
-		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -196,6 +227,25 @@
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "campaignId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "WithdrawApproval",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -301,6 +351,11 @@
 				"internalType": "bool",
 				"name": "pendingApproval",
 				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "withdrawApproved",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -360,6 +415,11 @@
 					{
 						"internalType": "bool",
 						"name": "pendingApproval",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "withdrawApproved",
 						"type": "bool"
 					},
 					{
@@ -435,6 +495,11 @@
 					{
 						"internalType": "bool",
 						"name": "pendingApproval",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "withdrawApproved",
 						"type": "bool"
 					},
 					{

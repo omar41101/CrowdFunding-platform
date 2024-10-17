@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import BN from 'bn.js'; // Use BN.js directly for BigNumber handling
 import abi from '../CrowdFundingABI.json';
-import './DisplayCampaign.css';
 
-const contractAddress = "0x83f3C99Cc70133DBa8Db231591dCfFF5b9710991";
+const contractAddress = "0x8E06a29cA511bFa6Bf7Fec908e427cA14C619908";
 const contractABI = abi;
 
 const DisplayCampaign = ({ account }) => {
@@ -34,7 +33,8 @@ const DisplayCampaign = ({ account }) => {
       setLoading(false);
     }
   };
- const handleUpdateCampaign = async () => {
+
+  const handleUpdateCampaign = async () => {
     if (!selectedCampaign) return;
     try {
       const web3 = new Web3(window.ethereum);
@@ -46,10 +46,10 @@ const DisplayCampaign = ({ account }) => {
 
       await contract.methods
         .updateCampaign(
-          selectedCampaign, 
-          updateTitle, 
-          updateDescription, 
-          Web3.utils.toWei(updateTarget, 'ether'), 
+          selectedCampaign,
+          updateTitle,
+          updateDescription,
+          Web3.utils.toWei(updateTarget, 'ether'),
           updateImage
         )
         .send({ from: account });
@@ -61,6 +61,7 @@ const DisplayCampaign = ({ account }) => {
       alert("Failed to update campaign");
     }
   };
+
   // Fetch admin campaigns
   const fetchAdminCampaigns = async () => {
     try {
@@ -130,9 +131,6 @@ const DisplayCampaign = ({ account }) => {
     }
   };
 
-  // Handle campaign update
-   
-
   // Handle campaign deletion
   const handleDeleteCampaign = async (campaignId) => {
     try {
@@ -162,49 +160,46 @@ const DisplayCampaign = ({ account }) => {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8">Crowdfunding Campaigns</h1>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold text-center mb-6">Crowdfunding Campaigns</h1>
       {loading ? (
         <div className="text-center">Loading...</div>
       ) : activeCampaigns.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeCampaigns.map((campaign, index) => (
             <div
               key={index}
-              className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+              className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
               <img src={campaign.image} alt={campaign.title} className="h-48 w-full object-cover" />
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold mb-2 text-gray-900">{campaign.title}</h3>
-                <p className="text-gray-700 mb-4">{campaign.description}</p>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2 text-gray-800">{campaign.title}</h3>
+                <p className="text-gray-600 mb-3">{campaign.description}</p>
 
                 {/* Progress Bar */}
-                <div className="relative pt-1 mb-4">
-                  <div className="flex mb-2 items-center justify-between">
-                    <div>
-                      <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                        Progress
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-semibold inline-block text-blue-600">
-                        {(parseFloat(Web3.utils.fromWei(campaign.amountCollected, 'ether')) / parseFloat(Web3.utils.fromWei(campaign.target, 'ether')) * 100).toFixed(2)}%
-                      </span>
-                    </div>
+                <div className="mb-3">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs font-semibold text-blue-600">Progress</span>
+                    <span className="text-xs font-semibold text-blue-600">
+                      {(parseFloat(Web3.utils.fromWei(campaign.amountCollected, 'ether')) /
+                        parseFloat(Web3.utils.fromWei(campaign.target, 'ether')) * 100).toFixed(2)}%
+                    </span>
                   </div>
-                  <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                  <div className="w-full h-2 bg-gray-200 rounded-full">
                     <div
+                      className="h-full bg-blue-500 rounded-full"
                       style={{
-                        width: `${(parseFloat(Web3.utils.fromWei(campaign.amountCollected, 'ether')) / parseFloat(Web3.utils.fromWei(campaign.target, 'ether')) * 100).toFixed(2)}%`,
+                        width: `${(parseFloat(Web3.utils.fromWei(campaign.amountCollected, 'ether')) /
+                          parseFloat(Web3.utils.fromWei(campaign.target, 'ether')) * 100).toFixed(2)}%`,
                       }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600"
                     ></div>
                   </div>
                 </div>
 
                 {/* Amount Collected and Target */}
-                <p className="text-lg font-medium text-gray-900">
-                  {Web3.utils.fromWei(campaign.amountCollected, 'ether')} ETH / {Web3.utils.fromWei(campaign.target, 'ether')} ETH
+                <p className="text-lg font-medium text-gray-800">
+                  {Web3.utils.fromWei(campaign.amountCollected, 'ether')} ETH /{' '}
+                  {Web3.utils.fromWei(campaign.target, 'ether')} ETH
                 </p>
 
                 {/* Donation Input */}
@@ -213,32 +208,33 @@ const DisplayCampaign = ({ account }) => {
                   placeholder="Amount in ETH"
                   value={donationAmount}
                   onChange={(e) => setDonationAmount(e.target.value)}
-                  className="mt-4 w-full p-2 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-500 transition-colors"
+                  className="mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                 />
+
 
                 {/* Action Buttons */}
                 <div className="flex space-x-2 mt-4">
                   <button
                     onClick={() => handleDonate(index)}
-                    className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors duration-300"
+                    className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
                   >
                     Donate
                   </button>
                   <button
                     onClick={() => fetchDonators(index)}
-                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
                   >
                     Show Donators
                   </button>
                   <button
                     onClick={() => handleUpdateCampaign()}
-                    className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors duration-300"
+                    className="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition"
                   >
                     Update
                   </button>
                   <button
                     onClick={() => handleDeleteCampaign(index)}
-                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300"
+                    className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition"
                   >
                     Delete
                   </button>
@@ -246,7 +242,7 @@ const DisplayCampaign = ({ account }) => {
 
                 {/* Donators List */}
                 {donators[index] && (
-                  <div className="mt-4 p-4 bg-gray-200 rounded-lg">
+                  <div className="mt-4 bg-gray-100 p-4 rounded-md">
                     <h4 className="text-lg font-semibold">Donators:</h4>
                     <ul>
                       {donators[index].donatorAddresses.map((donator, idx) => (

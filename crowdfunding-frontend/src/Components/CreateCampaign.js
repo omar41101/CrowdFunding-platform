@@ -90,7 +90,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                     required
                   />
                 </div>
@@ -100,7 +100,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                     required
                   />
                 </div>
@@ -111,7 +111,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Target (ETH)"
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                     required
                   />
                 </div>
@@ -122,7 +122,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Duration (days)"
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                     required
                   />
                 </div>
@@ -133,7 +133,7 @@ const CreateCampaign = ({ contract, account }) => {
                     placeholder="Image URL"
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                     required
                   />
                 </div>
