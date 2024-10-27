@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import BN from 'bn.js'; // Use BN.js directly for BigNumber handling
 import abi from '../CrowdFundingABI.json';
 
-const contractAddress = "0x8E06a29cA511bFa6Bf7Fec908e427cA14C619908";
+const contractAddress = "0xf7DA46d3Ba9605DBb3a14fA60a694cF60929C219";
 const contractABI = abi;
 
 const DisplayCampaign = ({ account }) => {
@@ -176,6 +176,11 @@ const DisplayCampaign = ({ account }) => {
                 <h3 className="text-xl font-semibold mb-2 text-gray-800">{campaign.title}</h3>
                 <p className="text-gray-600 mb-3">{campaign.description}</p>
 
+                {/* Updated Deadline Display */}
+                <p className="text-gray-600 mb-3">
+  Days Remaining: {campaign.deadline} {/* Directly display the number of days */}
+</p>
+
                 {/* Progress Bar */}
                 <div className="mb-3">
                   <div className="flex justify-between mb-1">
@@ -210,7 +215,6 @@ const DisplayCampaign = ({ account }) => {
                   onChange={(e) => setDonationAmount(e.target.value)}
                   className="mt-3 w-full p-2 border rounded-md bg-black text-white focus:ring-2 focus:ring-blue-500 transition"
                 />
-
 
                 {/* Action Buttons */}
                 <div className="flex space-x-2 mt-4">
